@@ -2,7 +2,7 @@
 // Requires: npm install agora-rtc-sdk-ng
 
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import AgoraRTC, { IAgoraRTCClient, ILocalVideoTrack, IRemoteVideoTrack } from 'agora-rtc-sdk-ng';
+import AgoraRTC, { IAgoraRTCClient, ILocalVideoTrack, IMicrophoneAudioTrack, IRemoteVideoTrack } from 'agora-rtc-sdk-ng';
 
 @Component({
   selector: 'app-agora-video-demo',
@@ -13,7 +13,8 @@ export class AgoraVideoDemoComponent {
   @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('remoteVideo') remoteVideo!: ElementRef<HTMLVideoElement>;
   client: IAgoraRTCClient;
-  localTrack?: ILocalVideoTrack;
+  localVideoTrack?: ILocalVideoTrack;
+  localAudioTrack?: IMicrophoneAudioTrack;
 
   constructor() {
     // Create Agora client
@@ -29,11 +30,15 @@ export class AgoraVideoDemoComponent {
     await this.client.join(appId, channel, token, null);
 
     // Create and play local video track
-    this.localTrack = await AgoraRTC.createCameraVideoTrack();
-    this.localTrack.play(this.localVideo.nativeElement);
+    this.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+    this.localVideoTrack.play(this.localVideo.nativeElement);
 
     // Publish local video
-    await this.client.publish([this.localTrack]);
+    await this.client.publish([this.localVideoTrack]);
+
+    // Create and publish local audio track
+    this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+    await this.client.publish([this.localAudioTrack]);
 
     // Subscribe to remote user
     this.client.on('user-published', async (user, mediaType) => {
@@ -42,12 +47,16 @@ export class AgoraVideoDemoComponent {
         const remoteTrack = user.videoTrack as IRemoteVideoTrack;
         remoteTrack.play(this.remoteVideo.nativeElement);
       }
+      if (mediaType === 'audio' && user.audioTrack) {
+        const remoteAudioTrack = user.audioTrack;
+        remoteAudioTrack.play();
+      }
     });
   }
 
   async stopVideo() {
     // Clean up resources
-    this.localTrack?.close();
+    this.localVideoTrack?.close();
     await this.client.leave();
   }
 
