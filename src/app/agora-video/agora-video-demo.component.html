@@ -1,6 +1,9 @@
 <div>
   <video #localVideo autoplay muted></video>
   <video #remoteVideo autoplay></video>
+  <ul>
+    <li *ngFor="let mic of microphones">{{ mic.label || 'Microphone ' + mic.deviceId }}</li>
+  </ul>
   <button (click)="startVideo()">Start Video</button>
   <button (click)="stopVideo()">Stop Video</button>
 </div>

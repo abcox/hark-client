@@ -1,13 +1,16 @@
 // Agora Video Demo Component for Angular 19
 // Requires: npm install agora-rtc-sdk-ng
 
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import AgoraRTC, { IAgoraRTCClient, ILocalVideoTrack, IMicrophoneAudioTrack, IRemoteVideoTrack } from 'agora-rtc-sdk-ng';
 
 @Component({
-  selector: 'app-agora-video-demo',
-  templateUrl: './agora-video-demo.component.html',
-  styleUrls: ['./agora-video-demo.component.scss']
+    selector: 'app-agora-video-demo',
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './agora-video-demo.component.html',
+    styleUrls: ['./agora-video-demo.component.scss']
 })
 export class AgoraVideoDemoComponent {
   @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
@@ -15,6 +18,12 @@ export class AgoraVideoDemoComponent {
   client: IAgoraRTCClient;
   localVideoTrack?: ILocalVideoTrack;
   localAudioTrack?: IMicrophoneAudioTrack;
+
+  microphones: MediaDeviceInfo[] = [];
+
+  async ngOnInit() {
+    this.microphones = await AgoraRTC.getMicrophones();
+  }
 
   constructor() {
     // Create Agora client
@@ -37,7 +46,10 @@ export class AgoraVideoDemoComponent {
     await this.client.publish([this.localVideoTrack]);
 
     // Create and publish local audio track
-    this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+    // TODO: List available microphones and use selected one
+    this.microphones = await AgoraRTC.getMicrophones();
+    console.log('Available microphones:', this.microphones);
+    this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack(this.microphones[2]?.deviceId ? { microphoneId: this.microphones[2].deviceId } : undefined);
     await this.client.publish([this.localAudioTrack]);
 
     // Subscribe to remote user
