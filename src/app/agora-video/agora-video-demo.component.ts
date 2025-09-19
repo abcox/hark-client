@@ -33,7 +33,7 @@ export class AgoraVideoDemoComponent {
   async startVideo() {
     // Replace with your Agora App ID and token
     const appId = '129994eebffd4d128c92c3d57dfc98e0';
-    const token = '007eJxTYIjZVvNIXCRQnCvgc8qzFQk68Scn2U3PvHvbUGLGT5tQpQMKDIZGlpaWJqmpSWlpKSYphkYWyZZGycYppuYpacmWFqkGs4pPZzQEMjJcMr/AzMgAgSA+D0NKam6+bnJGYl5eag4DAwA3ESK/';
+    const token = '007eJxTYNBYceq9lrhYj+4Gu/3rrK+LvroUyZm+PuKdqkWVanJuzQsFBkMjS0tLk9TUpLS0FJMUQyOLZEujZOMUU/OUtGRLi1SDuOtnMxoCGRliJ31kYIRCEJ+HISU1N183OSMxLy81h4EBAEDkIuc=';
     const channel = 'demo-channel';
 
     await this.client.join(appId, channel, token, null);
